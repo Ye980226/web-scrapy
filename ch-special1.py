@@ -1,3 +1,4 @@
+import redis
 from decode_api import ch
 from bs4 import BeautifulSoup
 import time
@@ -7,6 +8,8 @@ import requests
 from urllib.parse import unquote, quote
 import re
 from requests_toolbelt import MultipartEncoder
+pool = redis.ConnectionPool(host='127.0.0.1', port=6379)
+redis_cli1 = redis.Redis(connection_pool=pool)
 # 加密的信息，不需要看懂
 ch.mxPageGuid._hexAligner = ch.mxPageGuid._getIntAligner(16)
 # 构建请求会话
@@ -81,4 +84,6 @@ r = Session.get(
     'http://pagelet.mafengwo.cn/poi/pagelet/poiTicketsApi?callback=jQuery%s&params={"poi_id":"78212"}&_=%s' % (string + str(timestamp_pagelet + 2), str(int(time.time() * 1000))), cookies=cookies, headers=headers)
 r = Session.get(
     'http://pagelet.mafengwo.cn/poi/pagelet/poiCommentListApi?callback=%s&params={"poi_id":"78212"}&_=%s' % (string + str(timestamp_pagelet + 3), str(int(time.time() * 1000))), cookies=cookies, headers=headers)
-print(r.text.encode().decode("unicode_escape"))
+
+
+redis_cli1.set('name1', r.text.encode().decode("unicode_escape"))
